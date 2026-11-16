@@ -34,3 +34,15 @@ import { getMovies } from "@/lib/movies"
 4. The code runs on the server. In development Next.js copies server logs to the browser console. Proof: the same line is in the terminal and in production it is not in the browser console
 
 5. The server-rendered static version with revalidate. It is fast good for SEO and it refreshes by itself
+
+## Lab 3
+
+1. Because Client Components can still be rendered on the server. usePathname() identifies the current route, and Next.js generates the initial HTML with aria-current="true"
+
+2. URL parameters are strings, so we convert the movie ID to a string. /movies/42 returns 404 because dynamicParams = false only allows IDs returned by generateStaticParams
+
+3. Both routes share the same layout, so Next.js keeps it mounted and preserves its state. Navigating to /about unmounts that layout, so the note is lost
+
+4. In the server terminal. Next.js hides the detailed error from the browser to prevent exposing sensitive server information
+
+5. /movies/2 is statically generated during the production build, so it doesn't need to show the loading fallback. /movies still uses dynamic rendering or data fetching, so its loading message can appear
