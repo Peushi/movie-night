@@ -46,3 +46,25 @@ import { getMovies } from "@/lib/movies"
 4. In the server terminal. Next.js hides the detailed error from the browser to prevent exposing sensitive server information
 
 5. /movies/2 is statically generated during the production build, so it doesn't need to show the loading fallback. /movies still uses dynamic rendering or data fetching, so its loading message can appear
+
+## Lab 4, part 1
+
+### 1. The 7 API calls during the build
+One call to /api/movies from generateStaticParams, to get the list of ids,
+and one call per movie (/api/movies/1 to /6) to prerender each movie page.
+/movies is dynamic, so it makes no call at build time. generateMetadata and
+the page both call getMovie with the same URL in the same render, and
+Next.js reuses the first result, so there is only one call per movie.
+
+### 2. Where MOVIES_API_KEY ended up
+It was not in the JavaScript, but it was in the HTML of every movie page,
+because the Client Component is also rendered on the server, where the
+variable exists. Anyone who views the page source can read it. The key
+should only be used in server code, like lib/movies.ts.
+
+### 3. Why Next.js refuses these
+Break 1: props sent to a Client Component must be turned into data. A
+function is code, so it cannot be sent to the browser.
+Break 2: lib/movies.ts is marked server-only because it uses server
+secrets and the API address. A Client Component runs in the browser, so it
+is not allowed to use it.
