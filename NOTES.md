@@ -68,3 +68,12 @@ function is code, so it cannot be sent to the browser.
 Break 2: lib/movies.ts is marked server-only because it uses server
 secrets and the API address. A Client Component runs in the browser, so it
 is not allowed to use it.
+
+## Lab 4, part 2
+
+### Strategies
+
+| Page | fetch option | Build output I expect | Real build output |
+|---|---|---|---|
+| /movies | next: { revalidate: 10 } | ○ with 10s (ISR) | ○ /movies, Revalidate 10s, Expire 1y |
+| /movies/[id] | cache: "force-cache" | ● one page per movie (SSG) | ● /movies/1 to /movies/6 |
