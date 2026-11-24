@@ -77,3 +77,10 @@ is not allowed to use it.
 |---|---|---|---|
 | /movies | next: { revalidate: 10 } | ○ with 10s (ISR) | ○ /movies, Revalidate 10s, Expire 1y |
 | /movies/[id] | cache: "force-cache" | ● one page per movie (SSG) | ● /movies/1 to /movies/6 |
+
+### Home page timings (first byte / total)
+| Version | First byte | Total |
+|---|---|---|
+| No Suspense, two awaits | 2.67 s | 2.67 s |
+| Suspense, two awaits | 0.12 s | 2.65 s |
+| Suspense, Promise.all | 0.12 s | 1.63 s |
