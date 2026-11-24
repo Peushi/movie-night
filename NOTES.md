@@ -84,3 +84,28 @@ is not allowed to use it.
 | No Suspense, two awaits | 2.67 s | 2.67 s |
 | Suspense, two awaits | 0.12 s | 2.65 s |
 | Suspense, Promise.all | 0.12 s | 1.63 s |
+
+### When the API is down
+
+| Page | What you see | Why |
+|---|---|---|
+| /movies | The list still works | ISR: the last good version is served. The background regeneration fails (fetch failed in the terminal), so the old page stays |
+| /movies/2 | The movie still works | SSG: the page was made at build time and never calls the API again |
+| / | The title and "Counting the votes...", then the list fails | SSR: the votes are fetched on each request. The title was already sent with status 200 before the error |
+| /movies-client | "Loading movies...", then the error message | CSR: the browser calls the API itself after the page loads, and the call fails |
+
+A build with the API stopped fails with ECONNREFUSED, because the build fetches the data to prerender the pages.
+
+### Questions
+
+1. Strategies:
+- /movies/[id] is SSG: movie details almost never change, so one page per movie at build time is fastest.
+- /movies is ISR: the list can change, but being 10 seconds old is fine, and most visitors get a ready page.
+- / is SSR with streaming: the votes change all the time, so they are fetched on each request, and the title is shown first.
+- /movies-client is CSR: the browser fetches the list after the page loads. It is only there to compare.
+
+2. The 8 calls after rm -rf .next/cache: /api/movies once for generateStaticParams (force-cache) and once for the /movies page (revalidate 10). They have different options, so they are two calls. Then /api/movies/1 to /6, one per movie page.
+
+3. Timings:
+- Suspense improves the first byte (2.67 s to 0.12 s): the page is sent right away, and the slow list comes later in the same response. The total does not change.
+- Promise.all improves the total (2.65 s to 1.63 s): the two requests run at the same time, so the page waits for the slower one (1.5 s), not the sum of both (2.5 s).
