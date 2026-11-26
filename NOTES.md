@@ -108,4 +108,22 @@ A build with the API stopped fails with ECONNREFUSED, because the build fetches 
 
 3. Timings:
 - Suspense improves the first byte (2.67 s to 0.12 s): the page is sent right away, and the slow list comes later in the same response. The total does not change.
-- Promise.all improves the total (2.65 s to 1.63 s): the two requests run at the same time, so the page waits for the slower one (1.5 s), not the sum of both (2.5 s).
+- Promise.all improves the total (2.65 s to 1.63 s): the two requests run at the same time, so the page waits for the slower one (1.5 s), not the sum of both (2.5 s)
+
+## Lab 5, part 1
+
+### 1. 400 or 404
+"abc" is not a valid id, so the request itself is wrong: 400. 99 is a valid
+id, but no movie has it: 404. A 400 tells the client to fix its request. A
+404 tells it the movie does not exist.
+
+### 2. Why TopMovies calls getVotes() directly
+TopMovies already runs on the server, so it can read the data directly.
+Calling its own API would mean the server sends a request to itself, which
+is slower and needs the full address.
+
+### 3. No NEXT_PUBLIC_ and no CORS any more
+The page and the API are now on the same origin, so the page uses a
+relative URL (/api/movies). It needs no public address, and CORS only
+applies between different origins. A POST to /api/movies answers 405,
+because the route only exports GET.
